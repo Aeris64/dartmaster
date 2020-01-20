@@ -4,8 +4,7 @@ class scoring {
     questions = require('../questions');
     nbPlayer = Number;
     allPlayer = new Map();
-    maxScore = 0;
-    win = 20;
+    goalScore = 301;
 
     constructor(number){
         this.nbPlayer = number;
@@ -14,23 +13,19 @@ class scoring {
     endScoring(){
         let bool = true;
 
-        if(this.maxScore == this.win){
-            for(let player of this.allPlayer){
-                if(player[1] == this.maxScore){
-                    console.log(`Player : ${player[0]} win ! With ${this.maxScore} point(s).`);
-                    bool = false;
-                }
+        for(let player of this.allPlayer){
+            if(player[1] == 0){
+                console.log(`Player : ${player[0]} win this game !`);
+                bool = false;
             }
         }
 
         return bool
     }
 
-    score(player, sector){
-        if(this.allPlayer.get(player)+1 == sector)
-            this.allPlayer.set(player, sector);
-        if(this.allPlayer.get(player) > this.maxScore)
-            this.maxScore = this.allPlayer.get(player);
+    score(player, scoring){
+        if(this.allPlayer.get(player)-scoring >= 0)
+            this.allPlayer.set(player, this.allPlayer.get(player)-scoring);   
     }
     
     async start(){
@@ -39,8 +34,22 @@ class scoring {
         while(this.endScoring()){
             for(let player of this.allPlayer){
                 console.log(`Player : ${player}`);
-                let result = await inquirer.prompt(this.questions.scoring);
-                this.score(player[0], parseInt(result.sector,10));
+                let finalRes = [];
+                for(let i = 0 ; i<3 ; i++){
+                    finalRes[i] = await inquirer.prompt(this.questions.scoring);
+                }
+                Promise.all(finalRes)
+                    .then((res) => {
+                        let scoringF = 0;
+                        for(let someRes of res){
+                            if(someRes.scoring <= 60)
+                                scoringF+=someRes.scoring;
+                        }
+                        this.score(player[0], parseInt(scoringF));
+                    })
+                    .catch((err) => {
+                        throw new Error(err);
+                    })
             }
         }
     }
@@ -53,7 +62,7 @@ class scoring {
         let namePlayer = await inquirer.prompt(allQuestionsPlayerName);
         for(let i = 0 ; i<this.nbPlayer ; i++){
             console.log(namePlayer['p'+i]);
-            this.allPlayer.set(namePlayer['p'+i], 0);
+            this.allPlayer.set(namePlayer['p'+i], this.goalScore);
         }
         return Promise.all(this.allPlayer)
     }

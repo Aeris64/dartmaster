@@ -1,5 +1,6 @@
 'use strict'
 // Import module
+require('events').EventEmitter.defaultMaxListeners = 999;
 const inquirer = require('inquirer');
 
 const World = require('./class/world').world;
@@ -18,7 +19,7 @@ function gameplay(res){
             break;
         case 'n2':
             console.log('**N*2 - le 301**');
-            let scoring = new scoring(res.nbPlayer);
+            let scoring = new Scoring(res.nbPlayer);
             scoring.start();
             break;
         case 'n3':

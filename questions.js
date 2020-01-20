@@ -32,8 +32,8 @@ exports.world = questions = [
 exports.scoring = questions = [
     {
         type: 'input',
-        name: 'sector',
-        message: 'Sector :',
+        name: 'scoring',
+        message: 'Scoring :',
         validate: function(value) {
           var valid = !isNaN(parseFloat(value));
           return valid || 'Please enter a number';
