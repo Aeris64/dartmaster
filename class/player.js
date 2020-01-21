@@ -9,9 +9,9 @@ class Player {
         this.score = score;
     }
 
-    getScore(){
-        return this.score;
-    }
+    getScore(){ return this.score; }
+
+    getName(){ return this.name; }
 }
 
 exports.player = Player;

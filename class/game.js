@@ -1,7 +1,7 @@
 class Game {
     status = false;
     listPlayer = [];
-    listWinner = [];
+    listWinner = new Map();
 
     constructor() {
         if(this.constructor == Game){
@@ -16,6 +16,12 @@ class Game {
     getListPlayer(){
         return this.listPlayer;
     }
+
+    addListWinner(player){
+        this.listWinner.set(player.name, player)
+    }
+
+    getListWinner(){ return this.listWinner; }
 
     setScore(score){
         for(let player of this.listPlayer){

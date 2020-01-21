@@ -6,70 +6,27 @@ const Game = require('./game').game;
 
 class scoring extends Game {
     questions = require('../questions');
-    nbPlayer = Number;
-    allPlayer = new Map();
-    goalScore = 301;
+    scoreBegin = 301;
 
     constructor(){
         super();
-        // this.nbPlayer = number;
     }
 
-    endScoring(){
-        let bool = true;
-
-        for(let player of this.allPlayer){
-            if(player[1] == 0){
-                console.log(`Player : ${player[0]} win this game !`);
-                bool = false;
-            }
-        }
-
-        return bool
-    }
-
-    score(player, scoring){
-        if(this.allPlayer.get(player)-scoring >= 0)
-            this.allPlayer.set(player, this.allPlayer.get(player)-scoring);   
-    }
-    
-    async start(){
-        await this.init();
-        
-        while(this.endScoring()){
-            for(let player of this.allPlayer){
-                console.log(`Player : ${player}`);
-                let finalRes = [];
-                for(let i = 0 ; i<3 ; i++){
-                    finalRes[i] = await inquirer.prompt(this.questions.scoring);
+    scoring(player, shoots){
+        for(let shoot of shoots){
+            shoot = shoot.shoot;
+            if(shoot <= 60){
+                if(player.getScore()-shoot > 1){
+                    player.setScore(player.getScore()-shoot);
+                } else if(shoot%2 == 0 && player.getScore()-shoot == 0){
+                    player.setScore(0);
                 }
-                Promise.all(finalRes)
-                    .then((res) => {
-                        let scoringF = 0;
-                        for(let someRes of res){
-                            if(someRes.scoring <= 60)
-                                scoringF+=someRes.scoring;
-                        }
-                        this.score(player[0], parseInt(scoringF));
-                    })
-                    .catch((err) => {
-                        throw new Error(err);
-                    })
+                if(player.getScore() == 0){
+                    super.setStatus(true);
+                    super.addListWinner(player);
+                }
             }
         }
-    }
-
-    async init(){
-        let allQuestionsPlayerName = [];
-        for(let i = 0 ; i<this.nbPlayer ; i++){
-            allQuestionsPlayerName.push(this.questions.playerName(i));
-        }
-        let namePlayer = await inquirer.prompt(allQuestionsPlayerName);
-        for(let i = 0 ; i<this.nbPlayer ; i++){
-            console.log(namePlayer['p'+i]);
-            this.allPlayer.set(namePlayer['p'+i], this.goalScore);
-        }
-        return Promise.all(this.allPlayer)
     }
 
     getHandleShoot(){
@@ -82,7 +39,7 @@ class scoring extends Game {
     }
 
     setScore(){
-        super.setScore(this.goalScore);
+        super.setScore(this.scoreBegin);
     }
 }
 
