@@ -1,13 +1,18 @@
+// Import module
 const inquirer = require('inquirer');
 
-class scoring {
+// Import class
+const Game = require('./game').game;
+
+class scoring extends Game {
     questions = require('../questions');
     nbPlayer = Number;
     allPlayer = new Map();
     goalScore = 301;
 
-    constructor(number){
-        this.nbPlayer = number;
+    constructor(){
+        super();
+        // this.nbPlayer = number;
     }
 
     endScoring(){
@@ -65,6 +70,19 @@ class scoring {
             this.allPlayer.set(namePlayer['p'+i], this.goalScore);
         }
         return Promise.all(this.allPlayer)
+    }
+
+    getHandleShoot(){
+        return inquirer.prompt(this.questions.scoring);
+    }
+
+    setListPlayer(listPlayer){
+        super.setListPlayer(listPlayer);
+        this.setScore();
+    }
+
+    setScore(){
+        super.setScore(this.goalScore);
     }
 }
 

@@ -1,14 +1,19 @@
+// Import module
 const inquirer = require('inquirer');
 
-class world {
+// Import class
+const Game = require('./game').game;
+
+class world extends Game {
     questions = require('../questions');
     nbPlayer = Number;
     allPlayer = new Map();
     goalScore = 0;
-    win = 20;
+    win = 2;
 
-    constructor(number){
-        this.nbPlayer = number;
+    constructor(){
+        super();
+        // this.nbPlayer = number;
     }
 
     endWorld(){
@@ -61,6 +66,18 @@ class world {
         }
     }
 
+    scoring(player, shoots){
+        for(let shoot of shoots){
+            shoot = shoot.shoot;
+            if(player.getScore()+1 == parseInt(shoot))
+                player.setScore(parseInt(shoot));
+            if(player.getScore() == this.win){
+                super.setStatus(true);
+                super.listWinner.push(player);
+            }
+        }
+    }
+
     async init(){
         let allQuestionsPlayerName = [];
         for(let i = 0 ; i<this.nbPlayer ; i++){
@@ -72,6 +89,19 @@ class world {
             this.allPlayer.set(namePlayer['p'+i], 0);
         }
         return Promise.all(this.allPlayer)
+    }
+
+    getHandleShoot(){
+        return inquirer.prompt(this.questions.world);
+    }
+
+    setListPlayer(listPlayer){
+        super.setListPlayer(listPlayer);
+        this.setScore();
+    }
+
+    setScore(){
+        super.setScore(this.goalScore);
     }
 }
 
