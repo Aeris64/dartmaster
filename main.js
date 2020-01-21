@@ -7,7 +7,7 @@ const inquirer = require('inquirer');
 const Player = require('./class/player').player;
 const World = require('./class/world').world;
 const Scoring = require('./class/scoring').scoring;
-const Cricket = require('./class/cricket').cricket:
+const Cricket = require('./class/cricket').cricket;
 
 const questions = require('./questions');
 
