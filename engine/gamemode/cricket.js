@@ -2,10 +2,10 @@
 const inquirer = require('inquirer');
 
 // Import class
-const Game = require('./game').game;
+const Game = require('../game').game;
 
 class Cricket extends Game {
-    questions = require('../questions');
+    questions = require('../../questions');
     scoreBegin = 0;
     scoreWin = 20;
 

@@ -4,10 +4,10 @@ require('events').EventEmitter.defaultMaxListeners = 999;
 const inquirer = require('inquirer');
 
 // Import class
-const Player = require('./class/player').player;
-const World = require('./class/world').world;
-const Scoring = require('./class/scoring').scoring;
-const Cricket = require('./class/cricket').cricket;
+const Player = require('./engine/player').player;
+const World = require('./engine/gamemode/world').world;
+const Scoring = require('./engine/gamemode/scoring').scoring;
+const Cricket = require('./engine/gamemode/cricket').cricket;
 
 const questions = require('./questions');
 
