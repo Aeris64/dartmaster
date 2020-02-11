@@ -14,6 +14,7 @@ const questions = require('./questions');
 console.log('Welcome to Dart Master.');
 
 async function start() {
+    window.location.replace("../views/nbUsers.html");
     let nbPlayer = (await inquirer.prompt(questions.nbPlayer)).nbPlayer;
     console.log(nbPlayer);
     let allPlayer = [];
@@ -34,7 +35,7 @@ async function start() {
             gameplay = new Cricket();
             break;
         default:
-            return new Error();
+            return new Error('Games not found');
     }
     gameplay.setListPlayer(allPlayer);
     while(!gameplay.getStatus()){
@@ -52,4 +53,4 @@ async function start() {
     console.log('Winners..! ', gameplay.getListWinner().keys())
 }
 
-start()
+// start()
