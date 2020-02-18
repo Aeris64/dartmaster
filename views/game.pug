@@ -1,28 +1,27 @@
 html(charset='UTF-8')
     head
-        title Player
+        title Game
 
     body
         .container
             .jumbotron
-                h1.text-center Some Player
+                h1.text-center Some Game
             table.table.table-striped
                 thead
                     tr
                         th ID
+                        th Mode
                         th Name
-                        th Email
-                        th gameWin
-                        th gameLose
-                        th createdAt
-                        th Actions
+                        th Current Player Id
+                        th Status
+                        th Created at
                 tbody
                     tr
                         td #{result.id}
+                        td #{result.mode}
                         td #{result.name}
-                        td #{result.email}
-                        td #{result.gameWin}
-                        td #{result.gameLose}
+                        td #{result.currentPlayerId}
+                        td #{result.status}
                         td #{result.createdAt}
                         td
                             button.btn.btn-primary(type='button') Editer

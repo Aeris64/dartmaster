@@ -7,13 +7,10 @@ const path = require('path');
 
 const port = 8080;
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-app.use(bodyParser.json());
-
-// app.set('views', './views');
-// app.set('view engine', path.join(__dirname, "views"));
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
@@ -38,4 +35,4 @@ app.use((err, req, res, next) => {
   return res.status(err.status || 500).json({ err })
 });
 
-app.listen(port);
+app.listen(8080, console.log(`Server listen on port ${port}.`));

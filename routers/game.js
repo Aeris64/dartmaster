@@ -2,26 +2,52 @@
 const router = require('express').Router();
 const error = require('../errors/notFound');
 
-// Import temp DB
-const db = require('../db/db.json');
+// Import DB
+const db = require('./../db/connection.js').db;
 
 router.get('/', (req, res, next) => {
-    res.status(200).render('main', {
-        title: 'Bonjour !',
-        name: 'Toto',
-        content: 'Ma première page'
+    db.all('SELECT * FROM game')
+        .then((results) => {
+            res.results = JSON.stringify(results);
+            res.render('games', { results: results });
+        })
+        .catch((err) => {
+            throw new error.NotFoundError('Games not found');
+            console.log(err);
         });
-    res.status(200).json({ data: db.games });
-})
+});
 
 router.get('/:id', (req, res, next) => {
     let id = +req.params.id;
     if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
 
-    let data = db.games.find(game => game.id === id);
-    if (!data) throw new error.NotFoundError('Game not found');
-    res.json({ data });
-})
+    db.all("SELECT * FROM Game WHERE id=?", id)
+        .then((result) => {
+            if(!result[0]) throw new error.NotFoundError('Game not found');
+            res.results = JSON.stringify(result[0]);
+            res.render('game', { result: result[0] });
+        })
+        .catch((err) => {
+            throw new error.NotFoundError('Game not found');
+            console.log(err);
+        });
+});
+
+router.get('/:id/players', (req, res, next) => {
+    let id = +req.params.id;
+    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+
+    db.all("SELECT * FROM GamePlayer INNER JOIN Player ON Player.id = GamePlayer.playerId WHERE gameId=?", id)
+        .then((results) => {
+            res.resultss = JSON.stringify(results);
+            res.render('players', { results: results });
+        })
+        .catch((err) => {
+            console.log(err);
+            throw new error.NotFoundError('Game not found');
+            console.log(err);
+        });
+});
 
 
 router.post('/new', (req, res, next) => {
@@ -33,6 +59,163 @@ router.post('/new', (req, res, next) => {
     console.log(req.body)
 
     res.json( req.body );
-})
+});
+
+router.post('/', (req, res, next) => {
+    try{
+        req.body = JSON.parse(Object.keys(req.body)[0])
+    } catch(err) {
+        req.body = req.body
+    }
+    let mode = req.body.mode;
+    let name = req.body.name;
+
+    if(name && mode){
+        let date = new Date();
+        date = `${date.getUTCFullYear()}-${date.getUTCMonth()+1}-${date.getUTCDate()}`;
+        db.run('INSERT INTO Game (mode, name, status, createdAt) VALUES (?, ?, "draft", ?)', 
+            mode,
+            name,
+            date )
+        .then((value) => {
+            res.json({ value });
+        })
+        .catch((err) => res.send(err));
+    }
+});
+
+router.post('/:id/players', async (req, res, next) => {
+    let id = +req.params.id;
+    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+
+    try{
+        console.log(JSON.parse(Object.keys(req.body)[0]))
+    } catch(err) {
+        req.body = req.body
+    }
+    
+    let allPlayerId = [];
+    for(let user of req.body){
+        if(isNaN(user)){
+            if(user.name && user.email){
+                let date = new Date();
+                date = `${date.getUTCFullYear()}-${date.getUTCMonth()+1}-${date.getUTCDate()}`;
+                let res = await(
+                    db.run('INSERT INTO Player (name, email, gameWin, gameLose, createdAt) VALUES (?, ?, 0, 0, ?)', 
+                        user.name,
+                        user.email,
+                        date )
+                    .then((res)=> {
+                        return res.stmt.lastID;
+                    })
+                    .catch((err) => {
+                        throw new error.NotFoundError(err);
+                    })
+                );
+                allPlayerId.push(res);
+            }
+        } else {
+            allPlayerId.push(user);
+        }
+    }
+
+    let finalRes = [];
+    for(let idPlayer of allPlayerId){
+        let date = new Date();
+        date = `${date.getUTCFullYear()}-${date.getUTCMonth()+1}-${date.getUTCDate()}`;
+        db.run('INSERT INTO GamePlayer (playerId, gameId, createdAt) VALUES (?, ?, ?)', 
+            idPlayer,
+            id,
+            date )
+        .then((value) => {
+            return value;
+        })
+        .catch((err) => {
+            throw new error.NotFoundError(err);
+        });
+    }
+
+    Promise.all(finalRes)
+        .then((value) => {
+            console.log(value);
+            res.json({ value });
+        })
+        .catch((err) => {
+            throw new error.NotFoundError(err);
+        });
+});
+
+router.patch('/:id', (req, res, next) => {
+    let id = +req.params.id;
+    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+
+    try{
+        req.body = JSON.parse(Object.keys(req.body)[0])
+    } catch(err) {
+        req.body = req.body
+    }
+    let mode = req.body.mode;
+    let name = req.body.name;
+    let currentPlayerId = req.body.currentPlayerId;
+    let status = req.body.status;
+    db.all("SELECT * FROM Game WHERE id=?", id)
+        .then((result) => {
+            if(!result[0]) throw new error.NotFoundError('Game not found');
+            if(!mode) mode = result[0].mode;
+            if(!name) name = result[0].name;
+            if(!currentPlayerId) currentPlayerId = result[0].currentPlayerId;
+            if(!status) status = result[0].status;
+            db.run('UPDATE Game SET mode=?, name=?, currentPlayerId=?, status=? WHERE id=?', 
+                mode,
+                name,
+                currentPlayerId,
+                status,
+                id )
+            .then((value) => {
+                res.json({ value });
+            })
+            .catch((err) => {
+                console.log(err);
+                throw new error.NotFoundError('Game not updated');
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            throw new error.NotFoundError('Game not found');
+        });
+});
+
+router.delete('/:id', (req, res, next) => {
+    let id = +req.params.id;
+    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+
+    db.run('DELETE FROM Game WHERE id=?', id)
+    .then((value) => {
+        res.json({ value });
+    })
+    .catch((err) => res.send(err));
+});
+
+router.delete('/:id/players', (req, res, next) => {
+    let id = +req.params.id;
+    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+
+    let allId = [];
+    for(let id of req.query.id){
+        let testId = +id;
+        if (testId != id) throw new error.BadRequestError('Id should be a number');
+        else allId.push(testId);
+    }
+
+    let finalRes = [];
+    for(idPlayer of allId){
+        db.run('DELETE FROM GamePlayer WHERE playerId=? AND gameId=?', idPlayer, id)
+        .then((value) => {
+            finalRes.push(value);
+        })
+        .catch((err) => res.send(err));
+    }
+    res.json({ finalRes });
+});
 
 module.exports = router;
