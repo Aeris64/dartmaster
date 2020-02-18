@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
             throw new error.NotFoundError('Players not found');
             console.log(err);
         });
-})
+});
 
 router.get('/:id', (req, res, next) => {
     let id = +req.params.id;
@@ -31,7 +31,7 @@ router.get('/:id', (req, res, next) => {
             throw new error.NotFoundError('Player not found');
             console.log(err);
         });
-})
+});
 
 router.post('/new', (req, res, next) => {
     try{
@@ -44,6 +44,6 @@ router.post('/new', (req, res, next) => {
     let email = req.body.email;
 
     res.json({ email, name });
-})
+});
 
 module.exports = router;
