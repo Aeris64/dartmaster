@@ -1,0 +1,30 @@
+html(charset='UTF-8')
+    head
+        title Games
+
+    body
+        .container
+            .jumbotron
+                h1.text-center Liste des games
+            table.table.table-striped
+                thead
+                    tr
+                        th ID
+                        th Mode
+                        th Name
+                        th Current Player Id
+                        th Status
+                        th Created at
+                tbody
+                    tr
+                        each item in results
+                            td #{item.id}
+                            td #{item.mode}
+                            td #{item.name}
+                            td #{item.currentPlayerId}
+                            td #{item.status}
+                            td #{item.createdAt}
+                            td
+                                button.btn.btn-primary(type='button') Editer
+                                button.btn.btn-danger(type='button') Supprimer
+                            tr

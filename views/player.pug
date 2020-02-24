@@ -1,0 +1,30 @@
+html(charset='UTF-8')
+    head
+        title Player
+
+    body
+        .container
+            .jumbotron
+                h1.text-center Some Player
+            table.table.table-striped
+                thead
+                    tr
+                        th ID
+                        th Name
+                        th Email
+                        th gameWin
+                        th gameLose
+                        th createdAt
+                        th Actions
+                tbody
+                    tr
+                        td #{result.id}
+                        td #{result.name}
+                        td #{result.email}
+                        td #{result.gameWin}
+                        td #{result.gameLose}
+                        td #{result.createdAt}
+                        td
+                            button.btn.btn-primary(type='button') Editer
+                            button.btn.btn-danger(type='button') Supprimer
+                        tr

@@ -1,0 +1,25 @@
+html(charset='UTF-8')
+    head
+        title Players
+
+    body
+        .container
+            .jumbotron
+                h1.text-center Liste des joueurs
+            table.table.table-striped
+                thead
+                    tr
+                        th ID
+                        th Name
+                        th Email
+                        th Actions
+                tbody
+                    tr
+                    each item in results
+                        td #{item.id}
+                        td #{item.name}
+                        td #{item.email}
+                        td
+                            button.btn.btn-primary(type='button') Editer
+                            button.btn.btn-danger(type='button') Supprimer
+                        tr
