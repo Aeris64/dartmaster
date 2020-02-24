@@ -2,10 +2,10 @@
 
 ## Installation
 Mode console :
--node main.js
+* node main.js
 
 Mode API :
--node app.js
+* node app.js
 
 ## Done
 Moteur console :
