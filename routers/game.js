@@ -12,30 +12,30 @@ router.get('/', (req, res, next) => {
             res.render('games', { results: results });
         })
         .catch((err) => {
-            throw new error.NotFoundError('Games not found');
+            res.send(error.NotFoundError(err));
             console.log(err);
         });
 });
 
 router.get('/:id', (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     db.all("SELECT * FROM Game WHERE id=?", id)
         .then((result) => {
-            if(!result[0]) throw new error.NotFoundError('Game not found');
+            if(!result[0]) res.send(error.NotFoundError('Game not found'));
             res.results = JSON.stringify(result[0]);
             res.render('game', { result: result[0] });
         })
         .catch((err) => {
-            throw new error.NotFoundError('Game not found');
+            res.send(error.NotFoundError(err));
             console.log(err);
         });
 });
 
 router.get('/:id/players', (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     db.all("SELECT * FROM GamePlayer INNER JOIN Player ON Player.id = GamePlayer.playerId WHERE gameId=?", id)
         .then((results) => {
@@ -43,8 +43,7 @@ router.get('/:id/players', (req, res, next) => {
             res.render('players', { results: results });
         })
         .catch((err) => {
-            console.log(err);
-            throw new error.NotFoundError('Game not found');
+            res.send(error.NotFoundError(err));
             console.log(err);
         });
 });
@@ -80,13 +79,16 @@ router.post('/', (req, res, next) => {
         .then((value) => {
             res.json({ value });
         })
-        .catch((err) => res.send(err));
+        .catch((err) => {
+            res.send(error.NotFoundError(err));
+            console.log(err);
+        });
     }
 });
 
 router.post('/:id/players', async (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     try{
         console.log(JSON.parse(Object.keys(req.body)[0]))
@@ -109,7 +111,7 @@ router.post('/:id/players', async (req, res, next) => {
                         return res.stmt.lastID;
                     })
                     .catch((err) => {
-                        throw new error.NotFoundError(err);
+                        res.send(error.NotFoundError(err));
                     })
                 );
                 allPlayerId.push(res);
@@ -131,7 +133,7 @@ router.post('/:id/players', async (req, res, next) => {
             return value;
         })
         .catch((err) => {
-            throw new error.NotFoundError(err);
+            res.send(error.NotFoundError(err));
         });
     }
 
@@ -141,13 +143,13 @@ router.post('/:id/players', async (req, res, next) => {
             res.json({ value });
         })
         .catch((err) => {
-            throw new error.NotFoundError(err);
+            res.send(error.NotFoundError(err));
         });
 });
 
 router.patch('/:id', (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     try{
         req.body = JSON.parse(Object.keys(req.body)[0])
@@ -160,7 +162,7 @@ router.patch('/:id', (req, res, next) => {
     let status = req.body.status;
     db.all("SELECT * FROM Game WHERE id=?", id)
         .then((result) => {
-            if(!result[0]) throw new error.NotFoundError('Game not found');
+            if(!result[0]) res.send(error.NotFoundError('Game not found'));
             if(!mode) mode = result[0].mode;
             if(!name) name = result[0].name;
             if(!currentPlayerId) currentPlayerId = result[0].currentPlayerId;
@@ -176,34 +178,37 @@ router.patch('/:id', (req, res, next) => {
             })
             .catch((err) => {
                 console.log(err);
-                throw new error.NotFoundError('Game not updated');
+                res.send(error.NotFoundError(err));
             });
         })
         .catch((err) => {
             console.log(err);
-            throw new error.NotFoundError('Game not found');
+            res.send(error.NotFoundError(err));
         });
 });
 
 router.delete('/:id', (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     db.run('DELETE FROM Game WHERE id=?', id)
     .then((value) => {
         res.json({ value });
     })
-    .catch((err) => res.send(err));
+    .catch((err) => {
+        console.log(err);
+        res.send(error.NotFoundError(err));
+    });
 });
 
 router.delete('/:id/players', (req, res, next) => {
     let id = +req.params.id;
-    if (id != req.params.id) throw new error.BadRequestError('Id should be a number');
+    if (id != req.params.id) res.send(error.BadRequestError('Id should be a number'));
 
     let allId = [];
     for(let id of req.query.id){
         let testId = +id;
-        if (testId != id) throw new error.BadRequestError('Id should be a number');
+        if (testId != id) res.send(error.BadRequestError('Id should be a number'));
         else allId.push(testId);
     }
 
@@ -213,7 +218,10 @@ router.delete('/:id/players', (req, res, next) => {
         .then((value) => {
             finalRes.push(value);
         })
-        .catch((err) => res.send(err));
+        .catch((err) => {
+            console.log(err);
+            res.send(error.NotFoundError(err));
+        });
     }
     res.json({ finalRes });
 });

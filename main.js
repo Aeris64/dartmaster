@@ -14,7 +14,6 @@ const questions = require('./questions');
 console.log('Welcome to Dart Master.');
 
 async function start() {
-    window.location.replace("../views/nbUsers.html");
     let nbPlayer = (await inquirer.prompt(questions.nbPlayer)).nbPlayer;
     console.log(nbPlayer);
     let allPlayer = [];
@@ -53,4 +52,4 @@ async function start() {
     console.log('Winners..! ', gameplay.getListWinner().keys())
 }
 
-// start()
+start()

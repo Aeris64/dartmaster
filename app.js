@@ -5,7 +5,11 @@ const router = require('./router');
 const error = require('./errors/notFound');
 const path = require('path');
 
-const port = 8080;
+// Import file
+const config = require('./config.json');
+
+// Initialisation variable
+const port = config.port;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -20,10 +24,6 @@ app.use('/', router);
 app.get('/', (req, res, next) => {
   res.json({ data: {  message: 'Error 404 : NOT_API_AVAILABLE' } });
   res.redirect(301, '/games');
-});
-
-app.use((req, res, next) => {
-  throw new error.NotFoundError()
 });
 
 app.use((err, req, res, next) => {  

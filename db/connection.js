@@ -1,5 +1,9 @@
+// Import modul
 const db = require('sqlite');
 
-db.open('./db/dartMaster.db');
+// Import file
+const config = require('../config.json');
+
+db.open(config.path);
 
 exports.db = db;

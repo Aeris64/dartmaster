@@ -15,7 +15,7 @@ class scoring extends Game {
     scoring(player, shoots){
         for(let shoot of shoots){
             shoot = shoot.shoot;
-            if(shoot <= 60){a
+            if(shoot <= 60){
                 if(player.getScore()-shoot > 1){
                     player.setScore(player.getScore()-shoot);
                 } else if(shoot%2 == 0 && player.getScore()-shoot == 0){
