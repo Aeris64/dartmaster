@@ -39,7 +39,7 @@ router.get('/:id/players', (req, res, next) => {
 
     db.all("SELECT * FROM GamePlayer INNER JOIN Player ON Player.id = GamePlayer.playerId WHERE gameId=?", id)
         .then((results) => {
-            res.resultss = JSON.stringify(results);
+            res.results = JSON.stringify(results);
             res.render('players', { results: results });
         })
         .catch((err) => {
